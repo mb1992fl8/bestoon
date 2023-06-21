@@ -103,8 +103,9 @@ def register(request):
                 context = {'message': \
                            'برای فعال کردن اکانت بستون خود \
                             روی لینک روبرو کلیک کنید\n\
-                                  : \nhttp://localhost:8009/accounts/register/?email={}&code={}'.\
-                                      format(email, code)}
+                                  : \n{}?email={}&code={}'.\
+                                      format(request.build_absolute_uri('/accounts/register/'), \
+                                             email, code)}
                 #print "برای فعال کردن اکانت بستون خود روی لینک روبرو کلیک کنید : http://bestoon.ir/accounts/register/?email={}&code={}". format(email, code)
 
 
