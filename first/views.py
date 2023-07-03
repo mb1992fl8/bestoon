@@ -156,10 +156,10 @@ def register(request):
                         'اکانت شما ساخته شد. توکن شما\
                               {} است. آن را ذخیره کنید زیرا دیگر نمایش داده نخواهد شد.!\
                                   جدی'.format(this_token)}
-            return render(request, 'login.html', context)
+            return render(request, 'index.html', context)
         else:
             context = {'message': 'این کد فعال سازی معتبر نیست. در صورت نیاز دوباره تلاش کنید'}
-            return render(request, 'index.html', context)
+            return render(request, 'register.html', context)
     else:
         context = {'message': ''}
         return render(request, 'register.html', context)
