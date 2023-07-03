@@ -19,7 +19,7 @@ from first.models import User, Token, Expense, Income, Passwordresetcodes
 from datetime import datetime
 from django.contrib.auth.hashers import make_password
 #from postmark import PMMail
-
+from django.db.models import Sum, Count
 
 #from .utils import grecaptcha_verify, RateLimited
 
@@ -167,6 +167,22 @@ def register(request):
 
 
 
+@csrf_exempt
+def generalstat(request):
+    #TODO: should get a valid duration (from - to), if not, use 1 month.
+    #TODO: is the token valid?
+    this_token = request.POST['token']
+    this_user = User.objects.filter(token__token = this_token).get()
+    income = Income.objects.filter(user = this_user).\
+        aggregate(Count('amount'), Sum('amount'))
+    expense = Expense.objects.filter(user = this_user).\
+        aggregate(Count('amount'), Sum('amount'))
+    context = {}
+    context['expense'] = expense
+    context['income'] = income
+    return JsonResponse(context, encoder=JSONEncoder)
+
+
 
 def index(request):
     context = {}
@@ -178,6 +194,7 @@ def submit_income(request):
     """user submits an income """
 
     #TODO: validate data. user might be fake. Token might be fake. Amount might be fake.
+    #TODO: is the token valid?
     this_token = request.POST['token']
     this_user = User.objects.filter(token__token = this_token).get()
     if 'date' not in request.POST:
@@ -200,6 +217,7 @@ def submit_expense(request):
     """user submits an expense """
 
     #TODO: validate data. user might be fake. Token might be fake. Amount might be fake.
+    #TODO: is the token valid?
     this_token = request.POST['token']
     this_user = User.objects.filter(token__token = this_token).get()
     if 'date' not in request.POST:
