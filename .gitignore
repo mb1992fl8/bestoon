@@ -16,3 +16,12 @@ build/
 tests/report/
 *.pyc
 first/migrations
+bestoon/__init__.pyc
+bestoon/settings.pyc
+bestoon/urls.pyc
+bestoon/wsgi.pyc
+first/__init__.pyc
+first/admin.pyc
+first/migrations/0001_initial.pyc
+first/migrations/__init__.pyc
+first/models.pyc
