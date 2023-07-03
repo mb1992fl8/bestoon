@@ -125,7 +125,7 @@ def register(request):
                 #            'ایمیلی حاوی لینک فعال سازی اکانت \
                 #                به شما فرستاده شده، \
                 #                    لطفا پس از چک کردن ایمیل، روی لینک کلیک کنید.'}
-                return render(request, 'login.html', context)
+                return render(request, 'index.html', context)
         else:
             context = {'message': \
                        'متاسفانه این نام کاربری قبلا استفاده شده است. \
@@ -159,7 +159,7 @@ def register(request):
             return render(request, 'login.html', context)
         else:
             context = {'message': 'این کد فعال سازی معتبر نیست. در صورت نیاز دوباره تلاش کنید'}
-            return render(request, 'login.html', context)
+            return render(request, 'index.html', context)
     else:
         context = {'message': ''}
         return render(request, 'register.html', context)
