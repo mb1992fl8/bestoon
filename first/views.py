@@ -115,8 +115,8 @@ def register(request):
                 #                 to = email,
                 #                 text_body = "برای فعال \
                 # اکانت بستون خود روی لینک روبرو کلیک کنید\
-                # : http://bestoon.ir/accounts/register/?email={}&code={}".\
-                # format(email, code),
+                # : http://bestoon.ir/accounts/register/?code={}".\
+                # format(code),
                 #                 tag = "account request")
                 #message.send()
                 
@@ -134,7 +134,7 @@ def register(request):
             #TODO: keep the form data
             return render(request, 'register.html', context)
     elif request.GET.has_key('code'): # user clicked on code
-        email = request.GET['email']
+        #email = request.GET['email'] (THIS WAS IN A COMMIT, MAYBE IT WILL BE BACK)
         code = request.GET['code']
         if Passwordresetcodes.objects.filter\
             (code=code).exists(): 
@@ -144,7 +144,7 @@ def register(request):
             new_temp_user = Passwordresetcodes.objects.get(code=code)
             newuser = User.objects.create\
                 (username=new_temp_user.username, \
-                 password=new_temp_user.password, email=email)
+                 password=new_temp_user.password, email=new_temp_user.email)
             this_token = random_str(48)
             token = Token.objects.create(user=newuser, token=this_token)
             Passwordresetcodes.objects.filter\
