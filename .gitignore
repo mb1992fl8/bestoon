@@ -21,6 +21,7 @@ __pycache__
 
 # Editors
 *.sw[po]
+
 bestoon/__init__.pyc
 bestoon/settings.pyc
 bestoon/urls.pyc

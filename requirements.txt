@@ -2,3 +2,4 @@ Django==1.11.29
 python-postmark==0.4.10
 pytz==2023.3
 requests==2.12.4
+django-cors-middleware
