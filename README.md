@@ -3,4 +3,6 @@
 A simple expense and income system.
 
 ## TODO
-[] no need for login page after registration
+- [ ] login webservice (user/pass -> token)
+- [ ] a restful login service. user will give user pass and will get her token
+- [ ] local storage for ionic app. will store token and will using it when calling anything
