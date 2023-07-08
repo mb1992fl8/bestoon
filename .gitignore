@@ -9,7 +9,7 @@ tests/coverage_html/
 tests/.coverage
 build/
 tests/report/
-first/migrations
+first/migrations/*
 db.sqlite3
 
 # python

@@ -1,14 +1,4 @@
 {
-  "name": "ionic-app-base",
-  "app_id": "",
-  "type": "ionic1",
-  "integrations": {
-    "gulp": {}
-  },
-  "watchPatterns": [
-    "scss/**/*",
-    "www/**/*",
-    "!www/lib/**/*",
-    "!www/**/*.map"
-  ]
+  "name": "bestoon",
+  "app_id": ""
 }
