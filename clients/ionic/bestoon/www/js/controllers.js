@@ -1,10 +1,35 @@
 angular.module('starter.controllers', [])
 
+
+.controller('ConfigCtrl', function($scope, $http) {
+  $scope.login = function () { // check passwsord and user name with webservice
+    $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+    $http.post(
+      'http://localhost:8009/accounts/login/',
+      'username='+$scope.username+'&password='+$scope.password
+    )
+    .success(function(data){
+      console.log(data);
+      $scope.token = data['token'];
+      console.log($scope.token);
+    })
+    .error(function() {
+      $scope.message = 'erorr logging in' //TODO: show some error to user
+      console.log('error on login request')
+    })
+  }
+
+  $scope.logout = function () {
+    console.log('logout');
+    $scope.token = null;
+  }
+})
+
 .controller('DashCtrl', function($scope, $http) {
   $scope.$on('$ionicView.enter', function(e) {
     $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
     $http.post(
-      'http://localhost:8009/q/generalstat/',
+      'http://192.168.1.110:8009/q/generalstat/',
       'token=test'
     )
     .success(function(data){
@@ -28,7 +53,7 @@ angular.module('starter.controllers', [])
   $scope.submit = function() {
     $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
     $http.post(
-      'http://localhost:8009/submit/expense/',
+      'http://localhost/submit/expense/',
       'token=test&text='+$scope.text+'&amount='+$scope.amount
     )
     .success(function(data){
@@ -52,7 +77,7 @@ angular.module('starter.controllers', [])
   $scope.submit = function() {
     $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
     $http.post(
-      'http://localhost:8009/submit/income/',
+      'http://localhost/submit/income/',
       'token=test&text='+$scope.text+'&amount='+$scope.amount
     )
     .success(function(data){

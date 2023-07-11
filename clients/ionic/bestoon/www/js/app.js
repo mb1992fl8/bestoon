@@ -77,6 +77,16 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
         controller: 'IncomeCtrl'
       }
     }
+  })
+
+  .state('tab.config', {
+    url: '/config',
+    views: {
+      'tab-config': {
+        templateUrl: 'templates/tab-config.html',
+        controller: 'ConfigCtrl'
+      }
+    }
   });
 
   // if none of the above states are matched, use this as the fallback
