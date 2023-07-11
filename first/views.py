@@ -15,9 +15,10 @@ from json import JSONEncoder
 
 
 from django.views.decorators.csrf import csrf_exempt
+#from django.views.decorators.http import require_POST
 from first.models import User, Token, Expense, Income, Passwordresetcodes
 from datetime import datetime
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 #from postmark import PMMail
 from django.db.models import Sum, Count
 
@@ -34,7 +35,6 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
-
 def grecaptcha_verify(request):
     data = request.POST
     captcha_rs = data.get('g-recaptcha-response')
@@ -48,35 +48,54 @@ def grecaptcha_verify(request):
     verify_rs = verify_rs.json()
     return verify_rs.get("success", False)
 
+@csrf_exempt
+def login(request):
+    print (request.POST)
+    if request.POST.has_key('username') and request.POST.has_key('password'):
+        username = request.POST['username']
+        password = request.POST['password']
+        this_user = User.objects.get(username = username)
+        if (check_password(password, this_user.password)):
+            this_token = Token.objects.get(user = this_user)
+            token  = this_token.token
+
+            context = {}
+            context['result'] = 'ok'
+            context['token'] = token
+            return JsonResponse( context, encoder=JSONEncoder)
+        else:
+            context = {}
+            context['result'] = 'error'
+            return JsonResponse( context, encoder=JSONEncoder)
 
 
 
-
-random_str = lambda N:\
-      ''.join(random.SystemRandom()\
-              .choice(string.ascii_uppercase + \
-                      string.ascii_lowercase + \
-                        string.digits) for _ in range(N))
+random_str = lambda N:''.join(
+    random.SystemRandom().choice(
+        string.ascii_uppercase + 
+        string.ascii_lowercase + 
+        string.digits) for _ in range(N))
 
 
 
 
 
 def register(request):
-    if request.\
-        POST.has_key('requestcode'):\
-              #form is filled. if not spam,\
-              #  generate code and save in db, \
-              # wait for email confirmation, return message
+    if request.POST.has_key(
+        'requestcode'):  #form is filled. if not spam, 
+              #generate code and save in db, 
+              #wait for email confirmation, return message
         
         #is this spam? check reCaptcha
         if not grecaptcha_verify(request): # captcha was not correct
-            context = {'message': 'کپچای گوگل درست وارد نشده بود. شاید ربات هستید؟ \
-                       کد یا کلیک یا تشخیص عکس زیر فرم را درست پر کنید. \
-                       ببخشید که فرم به شکل اولیه برنگشته!'} #TODO: forgot password
+            context = {
+                'message': 'کپچای گوگل درست وارد نشده بود. شاید ربات هستید؟\
+                       کد یا کلیک یا تشخیص عکس زیر فرم را درست پر کنید.\
+                       ببخشید که فرم به شکل اولیه برنگشته!'}
+#TODO: forgot password
             return render(request, 'register.html', context)
 
-        if User.objects.filter(email = request.POST['email']).exists(\
+        if User.objects.filter(email=request.POST['email']).exists(
             ): # duplicate email
             context = {'message': 'متاسفانه \
                        این ایمیل قبلا استفاده شده است. \
@@ -87,7 +106,7 @@ def register(request):
             return render(request, 'register.html', context)
 
         if not User.objects.filter\
-            (username = request.POST['username'])\
+            (username=request.POST['username'])\
                 .exists(): #if user does not exists
                 code = random_str(28)
                 now = datetime.now()
@@ -95,18 +114,20 @@ def register(request):
                 password = make_password(request.POST['password'])
                 username = request.POST['username']
                 temporarycode = \
-                    Passwordresetcodes (email = email, \
-                                        time = now, code = code, \
+                    Passwordresetcodes (email=email, \
+                                        time=now, code=code, \
                                             username=username, password=password)
                 temporarycode.save()
                 
                 context = {'message': \
-                           'برای فعال کردن اکانت بستون خود \
-                            روی لینک روبرو کلیک کنید\n\
-                                  : \n{}?email={}&code={}'.\
+                           "برای فعال کردن اکانت بستون خود \
+                            روی لینک روبرو کلیک کنید\
+                                  :\n{}?email={}&code={}".\
                                       format(request.build_absolute_uri('/accounts/register/'), \
                                              email, code)}
-                #print "برای فعال کردن اکانت بستون خود روی لینک روبرو کلیک کنید : http://bestoon.ir/accounts/register/?email={}&code={}". format(email, code)
+                
+                #print "برای فعال کردن اکانت بستون خود روی لینک روبرو کلیک کنید :\
+                #  http://bestoon.ir/accounts/register/?email={}&code={}". format(email, code)
 
 
                 #message = PMMail(api_key = settings.POSTMARK_API_TOKEN,
@@ -130,10 +151,11 @@ def register(request):
             context = {'message': \
                        'متاسفانه این نام کاربری قبلا استفاده شده است. \
                         از نام کاربری دیگری استفاده کنید. \
-                            ببخشید که فرم ذخیره نشده. درست می شه'} #TODO: forgot password
+                            ببخشید که فرم ذخیره نشده. درست می شه'}
+            #TODO: forgot password
             #TODO: keep the form data
             return render(request, 'register.html', context)
-    elif request.GET.has_key('code'): # user clicked on code
+    elif request.GET.has_key('code'):  # user clicked on code
         #email = request.GET['email'] (THIS WAS IN A COMMIT, MAYBE IT WILL BE BACK)
         code = request.GET['code']
         if Passwordresetcodes.objects.filter\
@@ -168,14 +190,17 @@ def register(request):
 
 
 @csrf_exempt
+#@require_POST
 def generalstat(request):
-    #TODO: should get a valid duration (from - to), if not, use 1 month.
-    #TODO: is the token valid?
+    # TODO: should get a valid duration (from - to), if not, use 1 month.
+    # TODO: is the token valid?
+    print (request.GET)
+    print (request.POST)
     this_token = request.POST['token']
-    this_user = User.objects.filter(token__token = this_token).get()
-    income = Income.objects.filter(user = this_user).\
+    this_user = User.objects.filter(token__token=this_token).get()
+    income = Income.objects.filter(user=this_user).\
         aggregate(Count('amount'), Sum('amount'))
-    expense = Expense.objects.filter(user = this_user).\
+    expense = Expense.objects.filter(user=this_user).\
         aggregate(Count('amount'), Sum('amount'))
     context = {}
     context['expense'] = expense
@@ -193,22 +218,20 @@ def index(request):
 def submit_income(request):
     """user submits an income """
 
-    #TODO: validate data. user might be fake. Token might be fake. Amount might be fake.
-    #TODO: is the token valid?
+    # TODO: validate data. user might be fake. Token might be fake. Amount might be fake.
+    # TODO: is the token valid?
     this_token = request.POST['token']
-    this_user = User.objects.filter(token__token = this_token).get()
+    this_user = User.objects.filter(token__token=this_token).get()
     if 'date' not in request.POST:
         date = datetime.now()
-    Income.objects.create(user = this_user, amount = request.POST['amount'],
-                           text = request.POST['text'], date = date)
+    else:
+        date = request.POST['date']
+    Income.objects.create(user=this_user, amount=request.POST['amount'],
+                           text=request.POST['text'], date=date)
     
     return JsonResponse({
         'status': 'ok',
     }, encoder=JSONEncoder)
-
-
-
-
 
 
 @csrf_exempt
@@ -216,14 +239,16 @@ def submit_income(request):
 def submit_expense(request):
     """user submits an expense """
 
-    #TODO: validate data. user might be fake. Token might be fake. Amount might be fake.
-    #TODO: is the token valid?
+    # TODO: validate data. user might be fake. Token might be fake. Amount might be fake.
+    # TODO: is the token valid?
     this_token = request.POST['token']
-    this_user = User.objects.filter(token__token = this_token).get()
+    this_user = User.objects.filter(token__token=this_token).get()
     if 'date' not in request.POST:
         date = datetime.now()
-    Expense.objects.create(user = this_user, amount = request.POST['amount'],
-                           text = request.POST['text'], date = date)
+    else:
+        date = request.POST['date']
+    Expense.objects.create(user=this_user, amount=request.POST['amount'],
+                           text=request.POST['text'], date=date)
     
     return JsonResponse({
         'status': 'ok',
