@@ -7,7 +7,7 @@ import string
 import time
 
 from django.conf import settings
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from json import JSONEncoder
 
@@ -187,6 +187,15 @@ def register(request):
         return render(request, 'register.html', context)
 
 
+@csrf_exempt
+def whoami(request):
+    this_token = request.POST['token']  # TODO: Check if there is no `token`
+    # Check if there is a user with this token; will retun 404 instead.
+    this_user = get_object_or_404(User, token__token = this_token)
+
+    return JsonResponse({
+        'user': this_user.username,
+    }, encoder=JSONEncoder)
 
 
 @csrf_exempt
