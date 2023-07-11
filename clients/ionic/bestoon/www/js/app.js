@@ -104,10 +104,10 @@ function back_to_login_page($scope, $state) {
 
 
 var storage = window.localStorage;
+
 var token = storage.getItem('token');
 
 bestoonURL = storage.getItem('bestoonURL')
-console.log(bestoonURL)
 
 if (!bestoonURL) {
   var bestoonURL = 'http://localhost:8009/';
