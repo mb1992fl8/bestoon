@@ -67,25 +67,23 @@ random_str = lambda N:''.join(
 
 @csrf_exempt
 def login(request):
-    print (request.POST)
+    print(request.POST)
     if request.POST.has_key('username') and request.POST.has_key('password'):
         username = request.POST['username']
         password = request.POST['password']
-        this_user = get_object_or_404(User, username = username)
+        this_user = get_object_or_404(User, username=username)
         if (check_password(password, this_user.password)):
-            this_token = get_object_or_404(Token, user = this_user)
-            token  = this_token.token
+            this_token = get_object_or_404(Token, user=this_user)
+            token = this_token.token
 
             context = {}
             context['result'] = 'ok'
             context['token'] = token
-            return JsonResponse( context, encoder=JSONEncoder)
+            return JsonResponse(context, encoder=JSONEncoder)
         else:
             context = {}
             context['result'] = 'error'
-            return JsonResponse( context, encoder=JSONEncoder)
-
-
+            return JsonResponse(context, encoder=JSONEncoder)
 
 
 def register(request):
@@ -103,8 +101,8 @@ def register(request):
 #TODO: forgot password
             return render(request, 'register.html', context)
 
-        if User.objects.filter(email=request.POST['email']).exists(
-            ): # duplicate email
+        # duplicate email
+        if User.objects.filter(email=request.POST['email']).exists():
             context = {'message': 'متاسفانه \
                        این ایمیل قبلا استفاده شده است. \
                        در صورتی که این ایمیل شما است،\
@@ -112,19 +110,16 @@ def register(request):
                        ببخشید که فرم ذخیره نشده. درست می شه'} #TODO: forgot password
             #TODO: keep the form data
             return render(request, 'register.html', context)
-
-        if not User.objects.filter\
-            (username=request.POST['username'])\
-                .exists(): #if user does not exists
+        #if user does not exists
+        if not User.objects.filter(username=request.POST['username']).exists():
                 code = get_random_string(length=32)
                 now = datetime.now()
                 email = request.POST['email']
                 password = make_password(request.POST['password'])
                 username = request.POST['username']
-                temporarycode = \
-                    Passwordresetcodes (email=email, \
-                                        time=now, code=code, \
-                                            username=username, password=password)
+                temporarycode = Passwordresetcodes(
+                    email=email, time=now, code=code, 
+                    username=username, password=password)
                 temporarycode.save()
                 
                 context = {'message': \
@@ -177,9 +172,9 @@ def register(request):
                  password=new_temp_user.password, email=new_temp_user.email)
             this_token = get_random_string(length=48)
             token = Token.objects.create(user=newuser, token=this_token)
-            Passwordresetcodes.objects.filter\
-                (code=code).delete() 
             #delete the temporary activation code from db
+            Passwordresetcodes.objects.filter(code=code).delete()
+            
             
 
             context = {'message':\
@@ -188,7 +183,8 @@ def register(request):
                                   جدی'.format(this_token)}
             return render(request, 'index.html', context)
         else:
-            context = {'message': 'این کد فعال سازی معتبر نیست. در صورت نیاز دوباره تلاش کنید'}
+            context = {
+                'message': 'این کد فعال سازی معتبر نیست. در صورت نیاز دوباره تلاش کنید'}
             return render(request, 'register.html', context)
     else:
         context = {'message': ''}
@@ -200,7 +196,7 @@ def register(request):
 def whoami(request):
     this_token = request.POST['token']  # TODO: Check if there is no `token`
     # Check if there is a user with this token; will retun 404 instead.
-    this_user = get_object_or_404(User, token__token = this_token)
+    this_user = get_object_or_404(User, token__token=this_token)
 
     return JsonResponse({
         'user': this_user.username,
@@ -216,10 +212,10 @@ def generalstat(request):
     print (request.POST)
     this_token = request.POST['token']
     this_user = get_object_or_404(User, token__token=this_token)
-    income = Income.objects.filter(user=this_user).\
-        aggregate(Count('amount'), Sum('amount'))
-    expense = Expense.objects.filter(user=this_user).\
-        aggregate(Count('amount'), Sum('amount'))
+    income = Income.objects.filter(user=this_user).aggregate(
+        Count('amount'), Sum('amount'))
+    expense = Expense.objects.filter(user=this_user).aggregate(
+        Count('amount'), Sum('amount'))
     context = {}
     context['expense'] = expense
     context['income'] = income
