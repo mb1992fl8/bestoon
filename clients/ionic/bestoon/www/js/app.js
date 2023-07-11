@@ -93,3 +93,20 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
   $urlRouterProvider.otherwise('/tab/dash');
 
 });
+
+
+function back_to_login_page($scope, $state) {
+  token = null;
+  $scope.loggedin = false;
+  storage.removeItem('token');
+  $state.go('tab.config');
+}
+
+var token = null;
+var storage = window.localStorage;
+
+bestoonURL = storage.getItem('bestoonURL')
+if (!bestoonURL) {
+  var bestoonURL = 'http://localhost:8009/';
+  storage.setItem('bestoonURL', 'http://localhost:8009')
+}

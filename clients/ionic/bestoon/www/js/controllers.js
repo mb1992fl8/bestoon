@@ -1,17 +1,35 @@
 angular.module('starter.controllers', [])
 
 
-.controller('ConfigCtrl', function($scope, $http) {
+.controller('ConfigCtrl', function($scope, $http, $state, $ionicHistory) {
+  $scope.loggedin = false;
+  token = storage.getItem('token');
+  if (token) {
+    $scope.loggedin = true;
+  }
+
   $scope.login = function () { // check passwsord and user name with webservice
     $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
     $http.post(
-      'http://localhost:8009/accounts/login/',
+      bestoonURL+'/accounts/login/',
       'username='+$scope.username+'&password='+$scope.password
     )
     .success(function(data){
-      console.log(data);
-      $scope.token = data['token'];
-      console.log($scope.token);
+      if (data.status = 'ok') {
+        console.log(data);
+        token = data['token'];
+        storage.setItem('token', token);
+        $scope.loggedin = true
+        console.log('logged in with token:'+token);
+        $ionicHistory.clearCache([$state.current.name]).then(function() {
+          $state.reload();
+        })
+        
+      }
+      else {
+        //request was fine but error in username or password.
+        // TODO: toast message about failed login
+      }
     })
     .error(function() {
       $scope.message = 'erorr logging in' //TODO: show some error to user
@@ -21,16 +39,24 @@ angular.module('starter.controllers', [])
 
   $scope.logout = function () {
     console.log('logout');
-    $scope.token = null;
+    storage.removeItem('token');
+    $scope.loggedin = false;
+    token = null;
+    $ionicHistory.clearCache([$state.current.name]).then(function() {
+      $state.reload();
+    })
   }
 })
 
-.controller('DashCtrl', function($scope, $http) {
+.controller('DashCtrl', function($scope, $http, $state) {
   $scope.$on('$ionicView.enter', function(e) {
+    if (!token) {
+      back_to_login_page($scope, $state);
+    }
     $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
     $http.post(
-      'http://192.168.1.110:8009/q/generalstat/',
-      'token=test'
+      bestoonURL+'/q/generalstat/',
+      'token='+token
     )
     .success(function(data){
       $scope.generalstat = data;
@@ -42,7 +68,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller('ExpenseCtrl', function($scope, $http) {
+.controller('ExpenseCtrl', function($scope, $http, $state) {
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
   // To listen for when this page is active (for example, to refresh data),
@@ -50,11 +76,16 @@ angular.module('starter.controllers', [])
   //
   //$scope.$on('$ionicView.enter', function(e) {
   //});
+  $scope.$on('$ionicView.enter', function(e) {
+    if (!token) {
+      back_to_login_page($scope, $state);
+    }
+  })
   $scope.submit = function() {
     $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
     $http.post(
-      'http://localhost/submit/expense/',
-      'token=test&text='+$scope.text+'&amount='+$scope.amount
+      bestoonURL+'/submit/expense/',
+      'token='+token+'&text='+$scope.text+'&amount='+$scope.amount
     )
     .success(function(data){
       $scope.text = '';
@@ -69,16 +100,28 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('ExpenseDetailCtrl', function($scope, $stateParams, Expense) {
+.controller('ExpenseDetailCtrl', function($scope, $stateParams, $state, Expense) {
+  $scope.$on('$ionicView.enter', function(e) {
+    if (!token) {
+      back_to_login_page($scope, $state);
+    }
+  })
+
   $scope.expense = Expense.get($stateParams.expenseId);
 })
 
-.controller('IncomeCtrl', function($scope, $http) {
+.controller('IncomeCtrl', function($scope, $http, $state) {
+  $scope.$on('$ionicView.enter', function(e) {
+    if (!token) {
+      back_to_login_page($scope, $state);
+    }
+  })
+
   $scope.submit = function() {
     $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
     $http.post(
-      'http://localhost/submit/income/',
-      'token=test&text='+$scope.text+'&amount='+$scope.amount
+      bestoonURL+'/submit/income/',
+      'token='+token+'&text='+$scope.text+'&amount='+$scope.amount
     )
     .success(function(data){
       $scope.text = '';

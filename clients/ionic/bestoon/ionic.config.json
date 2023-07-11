@@ -1,4 +1,5 @@
 {
   "name": "bestoon",
-  "app_id": ""
+  "integrations": {},
+  "type": "angular"
 }
