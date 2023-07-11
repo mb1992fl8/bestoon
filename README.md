@@ -28,6 +28,7 @@ To run tests in Bestoon simply use `python manage.py test`.
 If you want more verbosity you can use `-v` option with `0, 1, 2, or 3.`; e.g. `python manage.py test -v2`
 
 ## More Clients
+The project contains two different clients (command line and an ionic app for android/iOS) but all the 3rd party clients are more than welcomed. Add yours below.
 
 [Ruby Console Clients API bestoon]("http://github.com/shayanzare007/ruby-bestoon-api")
 
