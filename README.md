@@ -30,7 +30,8 @@ If you want more verbosity you can use `-v` option with `0, 1, 2, or 3.`; e.g. `
 ## More Clients
 The project contains two different clients (command line and an ionic app for android/iOS) but all the 3rd party clients are more than welcomed. Add yours below.
 
-[Ruby Console Clients API bestoon]("http://github.com/shayanzare007/ruby-bestoon-api")
+- [Ruby Console Clients API bestoon]("http://github.com/shayanzare007/ruby-bestoon-api")
+- [Angular 2 Web Client](https://github.com/n1arash/ngBestoon)
 
 ## TODO
 - [ ] login webservice (user/pass -> token)
