@@ -109,5 +109,5 @@ var token = storage.getItem('token');
 bestoonURL = storage.getItem('bestoonURL')
 if (!bestoonURL) {
   var bestoonURL = 'http://localhost:8009/';
-  storage.setItem('bestoonURL', 'http://localhost:8009')
+  storage.setItem('bestoonURL', bestoonURL)
 }
