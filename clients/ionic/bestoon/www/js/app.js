@@ -102,8 +102,9 @@ function back_to_login_page($scope, $state) {
   $state.go('tab.config');
 }
 
-var token = null;
+
 var storage = window.localStorage;
+var token = storage.getItem('token');
 
 bestoonURL = storage.getItem('bestoonURL')
 if (!bestoonURL) {
