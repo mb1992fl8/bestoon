@@ -1,3 +1,4 @@
+
 # Bestoon project by mamad
 
 A simple expense and income system.
@@ -14,7 +15,9 @@ To run Bestoon in development mode; Just use steps bellow:
   git clone https://github.com/jadijadi/bestoon
   virtualenv -p python2 build  # Create virtualenv named build
   source build/bin/activate
+  cd bestoon
   pip install -r requirements.txt
+  mv bestonn/settings.py.sample bestoon/settings.py
   python manage.py migrate  # Create database tables
   ```
 
@@ -33,6 +36,7 @@ The project contains two different clients (command line and an ionic app for an
 - [Ruby Console Clients API bestoon]("http://github.com/shayanzare007/ruby-bestoon-api")
 - [Angular 2 Web Client](https://github.com/n1arash/ngBestoon)
 - [Bestoon Bash Script](https://github.com/moeinroid/Bestoon-bash-script)
+- [Bestoon Client for windows](https://github.com/BakhtiariMohammad/Bestoon-Client-for-windows)
 - [Bestoon Multiplatform Gui](https://github.com/alireza6677/BestoonGui)
 - [Telegram Bot Client](https://github.com/farbodgame/bestoon-telegram)
 - [Bestoon Telegram Bot](https://github.com/AlirezaieS/BestoonBot)

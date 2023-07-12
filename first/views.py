@@ -24,6 +24,7 @@ from django.db.models import Sum, Count
 
 #from .utils import grecaptcha_verify, RateLimited
 
+
 ###################################################################
 ###################################################################
 ###################################################################
@@ -62,32 +63,36 @@ from django.db.models import Sum, Count
 ######################################################################
 
 
+#Creating random string for Token
 random_str = lambda N: ''.join(
     random.SystemRandom().choice(
         string.ascii_uppercase + string.ascii_lowercase + string.digits)\
               for _ in range(N))
 
 
+
+#login, (API) , returns : JSON = status (ok|error) and token
 @csrf_exempt
 def login(request):
     print(request.POST)
-    if request.POST.has_key('username') and request.POST.has_key('password'):
+    if request.POST.has_key('username') and request.POST.has_key('password'): #check if POST request has username and password
         username = request.POST['username']
         password = request.POST['password']
         this_user = get_object_or_404(User, username=username)
-        if (check_password(password, this_user.password)):
+        if (check_password(password, this_user.password)): #authentication
             this_token = get_object_or_404(Token, user=this_user)
             token = this_token.token
             context = {}
             context['result'] = 'ok'
             context['token'] = token
-            return JsonResponse (context, encoder=JSONEncoder)
+            return JsonResponse (context, encoder=JSONEncoder) #return {'status':'ok', 'token':'TOKEN'}
         else:
             context = {}
             context['result'] = 'error'
-            return JsonResponse (context, encoder=JSONEncoder)
+            return JsonResponse (context, encoder=JSONEncoder) #return {'status':'error'}
 
 
+#register (web)
 def register(request):
     if request.POST.has_key(
         'requestcode'):  #form is filled. if not spam, 
@@ -194,6 +199,8 @@ def register(request):
         return render(request, 'register.html', context)
 
 
+
+#return username based on sent POST Token 
 @csrf_exempt
 def whoami(request):
     this_token = request.POST['token']  # TODO: Check if there is no `token`
@@ -202,9 +209,11 @@ def whoami(request):
 
     return JsonResponse({
         'user': this_user.username,
-    }, encoder=JSONEncoder)
+    }, encoder=JSONEncoder)   #return {'user':'USERNAME'}
 
 
+
+#return General Status of a user as Json (income,expense)
 @csrf_exempt
 def generalstat(request):
     # TODO: should get a valid duration (from - to), if not, use 1 month
@@ -220,14 +229,16 @@ def generalstat(request):
     context = {}
     context['expense'] = expense
     context['income'] = income
-    return JsonResponse(context, encoder=JSONEncoder)
+    return JsonResponse(context, encoder=JSONEncoder)  #return {'income':'INCOME','expanse':'EXPENSE'}
 
 
+#homepage of System
 def index(request):
     context = {}
     return render(request, 'index.html', context)
 
 
+#submit an income to system (api) , input : token(POST) , output : status = (ok)
 @csrf_exempt
 def submit_income(request):
     """ submit an income """
@@ -246,9 +257,10 @@ def submit_income(request):
 
     return JsonResponse({
         'status': 'ok',
-    }, encoder=JSONEncoder)
+    }, encoder=JSONEncoder) #return {'status':'ok'}
 
 
+#submit an expense to system (api) , input : token(POST) , output : status = (ok)
 @csrf_exempt
 def submit_expense(request):
     """ submit an expense """
@@ -267,7 +279,7 @@ def submit_expense(request):
 
     return JsonResponse({
         'status': 'ok',
-    }, encoder=JSONEncoder)
+    }, encoder=JSONEncoder) #return {'status':'ok'}
 
 
 
