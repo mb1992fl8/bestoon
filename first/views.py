@@ -1,68 +1,71 @@
 # -*- coding: utf-8 -*-
 
-#from __future__ import unicode_literals
-#import requests
-#import random
-#import string
-#import time
-
-from datetime import datetime
-from json import JSONEncoder
+from __future__ import unicode_literals
+import requests
+import random
+import string
+import time
 
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import User
-from django.db.models import Sum, Count
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.utils.crypto import get_random_string
+from json import JSONEncoder
+
 #from django.contrib.auth import authenticate, login, logout
+
+
 from django.views.decorators.csrf import csrf_exempt
 #from django.views.decorators.http import require_POST
 from first.models import User, Token, Expense, Income, Passwordresetcodes
 from datetime import datetime
-#from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.hashers import make_password, check_password
 #from postmark import PMMail
 from django.db.models import Sum, Count
 
 #from .utils import grecaptcha_verify, RateLimited
 
+###################################################################
+###################################################################
+###################################################################
+
+#-*- coding: utf-8 -*-
+#from __future__ import unicode_literals
+
+#from datetime import datetime
+#from json import JSONEncoder
+
+#from django.conf import settings
+#from django.shortcuts import render, get_object_or_404
+#from django.contrib.auth.hashers import make_password
+#from django.contrib.auth.models import User
+#from django.db.models import Sum, Count
+#from django.http import JsonResponse
+#from django.shortcuts import render
+#from django.utils.crypto import get_random_string
+#from django.views.decorators.csrf import csrf_exempt
+#from first.models import User, Token, Expense, Income, Passwordresetcodes
+#from datetime import datetime
+#from django.contrib.auth.hashers import make_password, check_password
+
+#from postmark import PMMail
+
+#from django.db.models import Sum, Count
+
 # Create your views here.
-from postmark import PMMail
+#from postmark import PMMail
 
-from .models import Token, Expense, Income, Passwordresetcodes
-from .utils import grecaptcha_verify
+#from .models import Token, Expense, Income, Passwordresetcodes
+#from .utils import grecaptcha_verify
+
+######################################################################
+######################################################################
+######################################################################
 
 
-random_str = lambda N:''.join(
+random_str = lambda N: ''.join(
     random.SystemRandom().choice(
-        string.ascii_uppercase + 
-        string.ascii_lowercase + 
-        string.digits) for _ in range(N))
-
-
-#def get_client_ip(request):
-#    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-#    if x_forwarded_for:
-#        ip = x_forwarded_for.split(',')[0]
-#    else:
-#        ip = request.META.get('REMOTE_ADDR')
-#    return ip
-
-
-#def grecaptcha_verify(request):
-#    data = request.POST
-#    captcha_rs = data.get('g-recaptcha-response')
-#    url = "https://www.google.com/recaptcha/api/siteverify"
-#    params = {
-#        'secret': settings.RECAPTCHA_SECRET_KEY,
-#        'response': captcha_rs,
-#        'remoteip': get_client_ip(request)
-#    }
-#    verify_rs = requests.get(url, params=params, verify=True)
-#    verify_rs = verify_rs.json()
-#    return verify_rs.get("success", False)
+        string.ascii_uppercase + string.ascii_lowercase + string.digits)\
+              for _ in range(N))
 
 
 @csrf_exempt
@@ -75,15 +78,14 @@ def login(request):
         if (check_password(password, this_user.password)):
             this_token = get_object_or_404(Token, user=this_user)
             token = this_token.token
-
             context = {}
             context['result'] = 'ok'
             context['token'] = token
-            return JsonResponse(context, encoder=JSONEncoder)
+            return JsonResponse (context, encoder=JSONEncoder)
         else:
             context = {}
             context['result'] = 'error'
-            return JsonResponse(context, encoder=JSONEncoder)
+            return JsonResponse (context, encoder=JSONEncoder)
 
 
 def register(request):
@@ -94,10 +96,10 @@ def register(request):
         
         #is this spam? check reCaptcha
         if not grecaptcha_verify(request): # captcha was not correct
-            context = {
+            context = {\
                 'message': 'کپچای گوگل درست وارد نشده بود. شاید ربات هستید؟\
-                       کد یا کلیک یا تشخیص عکس زیر فرم را درست پر کنید.\
-                       ببخشید که فرم به شکل اولیه برنگشته!'}
+                    کد یا کلیک یا تشخیص عکس زیر فرم را درست پر کنید.\
+                        ببخشید که فرم به شکل اولیه برنگشته!'}
 #TODO: forgot password
             return render(request, 'register.html', context)
 
@@ -125,8 +127,9 @@ def register(request):
                 context = {'message': \
                            "برای فعال کردن اکانت بستون خود \
                             روی لینک روبرو کلیک کنید\
-                                  :\n{}?email={}&code={}".\
-                                      format(request.build_absolute_uri('/accounts/register/'), \
+                                  :\{}?email={}&code={}".\
+                                      format(request.build_absolute_uri(\
+                    '/accounts/register/'), \
                                              email, code)}
                 
                 #print "برای فعال کردن اکانت بستون خود روی لینک روبرو کلیک کنید :\
@@ -191,7 +194,6 @@ def register(request):
         return render(request, 'register.html', context)
 
 
-
 @csrf_exempt
 def whoami(request):
     this_token = request.POST['token']  # TODO: Check if there is no `token`
@@ -204,12 +206,11 @@ def whoami(request):
 
 
 @csrf_exempt
-#@require_POST
 def generalstat(request):
-    # TODO: should get a valid duration (from - to), if not, use 1 month.
+    # TODO: should get a valid duration (from - to), if not, use 1 month
     # TODO: is the token valid?
-    print (request.GET)
-    print (request.POST)
+    print request.GET
+    print request.POST
     this_token = request.POST['token']
     this_user = get_object_or_404(User, token__token=this_token)
     income = Income.objects.filter(user=this_user).aggregate(
@@ -222,17 +223,17 @@ def generalstat(request):
     return JsonResponse(context, encoder=JSONEncoder)
 
 
-
 def index(request):
     context = {}
     return render(request, 'index.html', context)
 
-@csrf_exempt
-# Create your views here.
-def submit_income(request):
-    """user submits an income """
 
-    # TODO: validate data. user might be fake. Token might be fake. Amount might be fake.
+@csrf_exempt
+def submit_income(request):
+    """ submit an income """
+
+    # TODO; validate data. user might be fake. token might be fake, \
+    # amount might be...
     # TODO: is the token valid?
     this_token = request.POST['token']
     this_user = get_object_or_404(User, token__token=this_token)
@@ -241,19 +242,19 @@ def submit_income(request):
     else:
         date = request.POST['date']
     Income.objects.create(user=this_user, amount=request.POST['amount'],
-                           text=request.POST['text'], date=date)
-    
+                          text=request.POST['text'], date=date)
+
     return JsonResponse({
         'status': 'ok',
     }, encoder=JSONEncoder)
 
 
 @csrf_exempt
-# Create your views here.
 def submit_expense(request):
-    """user submits an expense """
+    """ submit an expense """
 
-    # TODO: validate data. user might be fake. Token might be fake. Amount might be fake.
+    # TODO; validate data. user might be fake. token might be fake, \
+    # amount might be...
     # TODO: is the token valid?
     this_token = request.POST['token']
     this_user = get_object_or_404(User, token__token=this_token)
@@ -263,7 +264,62 @@ def submit_expense(request):
         date = request.POST['date']
     Expense.objects.create(user=this_user, amount=request.POST['amount'],
                            text=request.POST['text'], date=date)
-    
+
     return JsonResponse({
         'status': 'ok',
     }, encoder=JSONEncoder)
+
+
+
+###################################################################3
+######################################################################
+#############################################################
+
+
+
+# -*- coding: utf-8 -*-
+
+#from __future__ import unicode_literals
+#import requests
+#import random
+#import string
+#import time
+
+
+#from django.contrib.auth import authenticate, login, logout
+#from django.views.decorators.http import require_POST
+#from postmark import PMMail
+
+#from .utils import grecaptcha_verify, RateLimited
+
+# Create your views here.
+
+
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+
+
+#def get_client_ip(request):
+#    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+#    if x_forwarded_for:
+#        ip = x_forwarded_for.split(',')[0]
+#    else:
+#        ip = request.META.get('REMOTE_ADDR')
+#    return ip
+
+
+#def grecaptcha_verify(request):
+#    data = request.POST
+#    captcha_rs = data.get('g-recaptcha-response')
+#    url = "https://www.google.com/recaptcha/api/siteverify"
+#    params = {
+#        'secret': settings.RECAPTCHA_SECRET_KEY,
+#        'response': captcha_rs,
+#        'remoteip': get_client_ip(request)
+#    }
+#    verify_rs = requests.get(url, params=params, verify=True)
+#    verify_rs = verify_rs.json()
+#    return verify_rs.get("success", False)

@@ -9,5 +9,4 @@ urlpatterns = [
     url(r'^accounts/whoami/?$', views.whoami, name='whoami'),
     url(r'^accounts/login/?$', views.login, name='login'),
     url(r'^$', views.index, name='index'),
-
 ]
