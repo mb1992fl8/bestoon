@@ -1,29 +1,30 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-import requests
-import random
-import string
-import time
+
+#import requests
+#import random
+#import string
+#import time
+
+from json import JSONEncoder
+from datetime import datetime
 
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from json import JSONEncoder
-
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.hashers import make_password, check_password
+from django.db.models import Sum, Count
+from django.views.decorators.http import require_POST
 #from django.contrib.auth import authenticate, login, logout
 
 
-from django.views.decorators.csrf import csrf_exempt
-#from django.views.decorators.http import require_POST
 from first.models import User, Token, Expense, Income, Passwordresetcodes
-from datetime import datetime
-from django.contrib.auth.hashers import make_password, check_password
+from .models import Token, Expense, Income, Passwordresetcodes
+from .utils import grecaptcha_verify, RateLimited
+
 #from postmark import PMMail
-from django.db.models import Sum, Count
-
-#from .utils import grecaptcha_verify, RateLimited
-
 
 ###################################################################
 ###################################################################
@@ -73,8 +74,8 @@ random_str = lambda N: ''.join(
 
 #login, (API) , returns : JSON = status (ok|error) and token
 @csrf_exempt
+@require_POST
 def login(request):
-    print(request.POST)
     if request.POST.has_key('username') and request.POST.has_key('password'): #check if POST request has username and password
         username = request.POST['username']
         password = request.POST['password']
@@ -202,6 +203,7 @@ def register(request):
 
 #return username based on sent POST Token 
 @csrf_exempt
+@require_POST
 def whoami(request):
     this_token = request.POST['token']  # TODO: Check if there is no `token`
     # Check if there is a user with this token; will retun 404 instead.
@@ -215,11 +217,10 @@ def whoami(request):
 
 #return General Status of a user as Json (income,expense)
 @csrf_exempt
+@require_POST
 def generalstat(request):
     # TODO: should get a valid duration (from - to), if not, use 1 month
     # TODO: is the token valid?
-    print request.GET
-    print request.POST
     this_token = request.POST['token']
     this_user = get_object_or_404(User, token__token=this_token)
     income = Income.objects.filter(user=this_user).aggregate(
@@ -240,6 +241,7 @@ def index(request):
 
 #submit an income to system (api) , input : token(POST) , output : status = (ok)
 @csrf_exempt
+@require_POST
 def submit_income(request):
     """ submit an income """
 
@@ -262,6 +264,7 @@ def submit_income(request):
 
 #submit an expense to system (api) , input : token(POST) , output : status = (ok)
 @csrf_exempt
+@require_POST
 def submit_expense(request):
     """ submit an expense """
 
