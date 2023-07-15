@@ -76,7 +76,8 @@ random_str = lambda N: ''.join(
 @csrf_exempt
 @require_POST
 def login(request):
-    if request.POST.has_key('username') and request.POST.has_key('password'): #check if POST request has username and password
+    #check if POST request has username and password
+    if request.POST.has_key('username') and request.POST.has_key('password'):
         username = request.POST['username']
         password = request.POST['password']
         this_user = get_object_or_404(User, username=username)
@@ -86,11 +87,13 @@ def login(request):
             context = {}
             context['result'] = 'ok'
             context['token'] = token
-            return JsonResponse (context, encoder=JSONEncoder) #return {'status':'ok', 'token':'TOKEN'}
+            #return {'status':'ok', 'token':'TOKEN'}
+            return JsonResponse (context, encoder=JSONEncoder)
         else:
             context = {}
             context['result'] = 'error'
-            return JsonResponse (context, encoder=JSONEncoder) #return {'status':'error'}
+            #return {'status':'error'}
+            return JsonResponse (context, encoder=JSONEncoder)
 
 
 #register (web)
@@ -215,7 +218,8 @@ def whoami(request):
 
 
 
-#return General Status of a user as Json (income,expense)
+# return General Status of a user as Json (income,expense)
+
 @csrf_exempt
 @require_POST
 def generalstat(request):
@@ -230,7 +234,8 @@ def generalstat(request):
     context = {}
     context['expense'] = expense
     context['income'] = income
-    return JsonResponse(context, encoder=JSONEncoder)  #return {'income':'INCOME','expanse':'EXPENSE'}
+    #return {'income':'INCOME','expanse':'EXPENSE'}
+    return JsonResponse(context, encoder=JSONEncoder)
 
 
 #homepage of System
@@ -239,7 +244,9 @@ def index(request):
     return render(request, 'index.html', context)
 
 
-#submit an income to system (api) , input : token(POST) , output : status = (ok)
+#submit an income to system (api) , input : token(POST) , output : status
+#  = (ok)
+
 @csrf_exempt
 @require_POST
 def submit_income(request):

@@ -14,13 +14,13 @@ class TestToken(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(
-            username = 'test',
-            email = 'test@bestoon.ir',
-            password = 'top_secret'
+            username='test',
+            email='test@bestoon.ir',
+            password='lampard8'
         )
         self.token = Token.objects.create(
-            user = self.user,
-            token = 'test_token'
+            user=self.user,
+            token='test_token'
         )
 
 
@@ -34,7 +34,7 @@ class TestToken(TestCase):
 
     def test_token(self):
         response = self.client.post(
-            '/accounts/whoami',{
+            '/accounts/whoami', {
                 'token': self.token.token,
             })
 

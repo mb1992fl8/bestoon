@@ -7,8 +7,10 @@ import time
 
 def RateLimited(maxPerSecond): # a decorator. @RateLimited(10) will let 10 runs in 1 seconds
     minInterval = 1.0 / float(maxPerSecond)
+    
     def decorate(func):
         lastTimeCalled = [0.0]
+        
         def rateLimitedFunction(*args,**kargs):
             elapsed = time.clock() - lastTimeCalled[0]
             leftToWait = minInterval - elapsed

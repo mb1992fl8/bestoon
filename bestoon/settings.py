@@ -37,10 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'first',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -101,7 +103,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
+# Internationalization 
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
@@ -119,3 +121,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+CORS_ORIGIN_ALLOW_ALL = True
+
+RECAPTCHA_SECRET_KEY = '6LeCsa8mAAAAAEnDsb7JJH1EqfQ32LzWdTCEJEma'
+POSTMARK_API_TOKEN='ff4d319e-435f-4b5c-9b2e-f59740e24804'
+#'262a6040-bcee-492f-bb2d-97e48c0fb4c1'
+#POSTMARK SERVER API TOKEN = 'ff4d319e-435f-4b5c-9b2e-f59740e24804'
