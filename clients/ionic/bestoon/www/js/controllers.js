@@ -44,15 +44,19 @@ angular.module('starter.controllers', [])
       })
     }
   })
-  .controller('NewsCtrl', function($scope, $http) {
+  .controller('NewsCtrl', function($scope, $http, $state) {
+    $scope.$on('$ionicView.enter', function(e) {
       $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
       $http.post(bestoonURL + '/news/').success(function(data) {
           $scope.news = JSON.parse(data);
         }).error(function() {
-          $scope.message = 'erorr reading news' //TODO: show some error to user
-          console.log('error on request')
+          $scope.message = 'erorr reading news' //TODO: show some error to user     console.log('error on request')
         })
+      })
   })
+
+
+  
   .controller('DashCtrl', function($scope, $http, $state) {
           $scope.$on('$ionicView.enter', function(e) {
             if (!token) {
