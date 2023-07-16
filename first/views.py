@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from json import JSONEncoder
 from datetime import datetime
 
+from django.core import serializers
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
@@ -20,8 +21,8 @@ from django.views.decorators.http import require_POST
 #from django.contrib.auth import authenticate, login, logout
 
 
-from first.models import User, Token, Expense, Income, Passwordresetcodes
-from .models import Token, Expense, Income, Passwordresetcodes
+#from first.models import User, Token, Expense, Income, Passwordresetcodes
+from .models import User, Token, Expense, Income, Passwordresetcodes, News
 from .utils import grecaptcha_verify, RateLimited
 
 #from postmark import PMMail
@@ -69,6 +70,14 @@ random_str = lambda N: ''.join(
     random.SystemRandom().choice(
         string.ascii_uppercase + string.ascii_lowercase + string.digits)\
               for _ in range(N))
+
+
+
+@csrf_exempt
+def news(request):
+    news = News.objects.all().order_by('-date')[:11]
+    news_serialized = serializers.serialize("json", news)
+    return JsonResponse(news_serialized, encoder=JSONEncoder, safe=False)
 
 
 
