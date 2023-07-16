@@ -49,7 +49,8 @@ angular.module('starter.controllers', [])
       $http.post(bestoonURL + '/news/').success(function(data) {
           $scope.news = JSON.parse(data);
         }).error(function() {
-          $scope.message = 'erorr reading news' //TODO: show some error to user       console.log('error on request')
+          $scope.message = 'erorr reading news' //TODO: show some error to user
+          console.log('error on request')
         })
   })
   .controller('DashCtrl', function($scope, $http, $state) {
@@ -84,7 +85,14 @@ angular.module('starter.controllers', [])
             if (!token) {
               back_to_login_page($scope, $state);
             }
+            $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+            $http.post(bestoonURL + '/q/expenses/', 'token='+token).success(function(data) {
+                $scope.expenses = JSON.parse(data);
+              }).error(function() {
+                $scope.message = 'erorr reading previous expenses' //TODO: show some error to user       console.log('error on request')
+            })            
           })
+
 
           $scope.submit = function() {
             $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
@@ -96,6 +104,14 @@ angular.module('starter.controllers', [])
                 $scope.text = '';
                 $scope.amount = '';
                 // show a TOAST
+
+                // update the expenses part, containing the new one
+                $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+                $http.post(bestoonURL + '/q/expenses/', 'token='+token).success(function(data) {
+                    $scope.expenses = JSON.parse(data);
+                  }).error(function() {
+                    $scope.message = 'erorr reading previous expenses' //TODO: show some error to user       console.log('error on request')
+                })                  
               })
               .error(function() {
                 $scope.message = 'خطا در ذخیره اطلاعات. بعدا دوباره تلاش کنید' //TODO: show some error to user
@@ -115,12 +131,20 @@ angular.module('starter.controllers', [])
           $scope.expense = Expense.get($stateParams.expenseId);
         })
 
+
         .controller('IncomeCtrl', function($scope, $http, $state) {
           $scope.$on('$ionicView.enter', function(e) {
             if (!token) {
               back_to_login_page($scope, $state);
             }
+            $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+            $http.post(bestoonURL + '/q/incomes/', 'token='+token).success(function(data) {
+                $scope.incomes = JSON.parse(data);
+              }).error(function() {
+                $scope.message = 'erorr reading previous incomes' //TODO: show some error to user       console.log('error on request')
+            })            
           })
+
 
           $scope.submit = function() {
             $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
@@ -132,6 +156,14 @@ angular.module('starter.controllers', [])
                 $scope.text = '';
                 $scope.amount = '';
                 // show a TOAST
+
+                // update the incomes part, containing the new one
+                $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+                $http.post(bestoonURL + '/q/incomes/', 'token='+token).success(function(data) {
+                    $scope.incomes = JSON.parse(data);
+                  }).error(function() {
+                    $scope.message = 'erorr reading previous incomes' //TODO: show some error to user       console.log('error on request')
+                })
               })
               .error(function() {
                 $scope.message = 'خطا در ذخیره اطلاعات. بعدا دوباره تلاش کنید' //TODO: show some error to user
