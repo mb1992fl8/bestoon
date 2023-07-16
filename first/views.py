@@ -213,17 +213,25 @@ def register(request):
 
 
 
+
+
 #return username based on sent POST Token 
 @csrf_exempt
 @require_POST
 def whoami(request):
-    this_token = request.POST['token']  # TODO: Check if there is no `token`
-    # Check if there is a user with this token; will retun 404 instead.
-    this_user = get_object_or_404(User, token__token=this_token)
+    if request.POST.has_key('token'):
+        this_token = request.POST['token']  # TODO: Check if there is no `token`-done-please check it
+        # Check if there is a user with this token; will retun 404 instead.
+        this_user = get_object_or_404(User, token__token=this_token)
 
-    return JsonResponse({
+        return JsonResponse({
         'user': this_user.username,
-    }, encoder=JSONEncoder)   #return {'user':'USERNAME'}
+        }, encoder=JSONEncoder)   #return {'user':'USERNAME'}
+
+    else:
+        return JsonResponse({
+            'message': 'لطفا token را نیز ارسال کنید .',
+        }, encoder=JSONEncoder) #
 
 
 
