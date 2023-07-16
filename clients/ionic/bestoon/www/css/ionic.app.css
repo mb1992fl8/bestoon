@@ -1,5 +1,4 @@
 @charset "UTF-8";
-
 /*
 To customize the look and feel of Ionic, you can override the variables
 in ionic's _variables.scss file.
@@ -9822,3 +9821,8 @@ a.button {
   opacity: 0;
   -webkit-transition-duration: 0s;
   transition-duration: 0s; }
+
+  ion-content {
+  direction: rtl;
+  margin-right: 10px;
+  margin-left: 10px; }
