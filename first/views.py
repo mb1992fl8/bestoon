@@ -345,10 +345,10 @@ def submit_income(request):
 @csrf_exempt
 @require_POST
 def edit_income(request):
-    """ edit an income """
+    """edit an income"""
     this_text = request.POST['text'] if 'text' in request.POST else ""
     this_amount = request.POST['amount'] if 'amount' in request.POST else "0"
-    this_pk = request.POST['id'] if 'id' in request.POST else "0"
+    this_pk = request.POST['id'] if 'id' in request.POST else "-1"
     this_token = request.POST['token'] if 'token' in request.POST else ""
     this_user = get_object_or_404(User, token__token=this_token)
 
@@ -391,7 +391,7 @@ def submit_expense(request):
 @csrf_exempt
 @require_POST
 def edit_expense(request):
-    """ edit an expense """    
+    """edit an expense"""    
     this_text = request.POST['text'] if 'text' in request.POST else ""
     this_amount = request.POST['amount'] if 'amount' in request.POST else "0"
     this_pk = request.POST['id'] if 'id' in request.POST else "0"
