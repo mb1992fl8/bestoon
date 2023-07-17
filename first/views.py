@@ -118,7 +118,7 @@ def register(request):
         
         #is this spam? check reCaptcha
         if not grecaptcha_verify(request): # captcha was not correct
-            context = {\
+            context = {
                 'message': 'کپچای گوگل درست وارد نشده بود. شاید ربات هستید؟\
                     کد یا کلیک یا تشخیص عکس زیر فرم را درست پر کنید.\
                         ببخشید که فرم به شکل اولیه برنگشته!'}
@@ -127,74 +127,86 @@ def register(request):
 
         # duplicate email
         if User.objects.filter(email=request.POST['email']).exists():
-            context = {'message': 'متاسفانه \
-                       این ایمیل قبلا استفاده شده است. \
-                       در صورتی که این ایمیل شما است،\
-                        از صفحه ورود گزینه فراموشی پسورد رو انتخاب کنین. \
-                       ببخشید که فرم ذخیره نشده. درست می شه'} #TODO: forgot password
+            context = {
+                'message': 'متاسفانه \
+                    این ایمیل قبلا استفاده شده است. \
+                    در صورتی که این ایمیل شما است،\
+                    از صفحه ورود گزینه فراموشی پسورد رو انتخاب کنین. \
+                    ببخشید که فرم ذخیره نشده. درست می شه'} #TODO: forgot password
             #TODO: keep the form data
             return render(request, 'register.html', context)
         #if user does not exists
         if not User.objects.filter(username=request.POST['username']).exists():
-                code = get_random_string(length=32)
-                now = datetime.now()
-                email = request.POST['email']
-                password = make_password(request.POST['password'])
-                username = request.POST['username']
-                temporarycode = Passwordresetcodes(
-                    email=email, time=now, code=code, 
-                    username=username, password=password)
-                temporarycode.save()
+            code = get_random_string(length=32)
+            now = datetime.now()
+            email = request.POST['email']
+            password = make_password(request.POST['password'])
+            username = request.POST['username']
+            temporarycode = Passwordresetcodes(
+                email=email, time=now, code=code, 
+                username=username, password=password)
+            temporarycode.save()
                 
-                context = {'message': \
-                           "برای فعال کردن اکانت بستون خود \
-                            روی لینک روبرو کلیک کنید\
-                                  :\{}?email={}&code={}".\
-                                      format(request.build_absolute_uri(\
-                    '/accounts/register/'), \
-                                             email, code)}
+            message = 'ایمیلی حاوی لینک‌ فعالسازی اکانت به شما فرستاده نشده! \
+                لطفا پس از چک کردن این صفحه روی لینک کلیک کنید.'
+            message = 'قدیما ایمیل فعالسازی نمی‌فرستادیم چون اصلا دامین نداشتیم. \
+                ولی الان اگه دامین داشته باشیم هم نمیتونیم بفرستیم \
+                    چون شرکتش تحریممون کرده. پس راحت و بی‌دردسر'
+            body = " برای فعال کردن اکانت بستون خود روی لینک روبرو کلیک کنید\
+                : <a href=\"{}?code={}\">لینک رو به رو</a>\
+                ".format(request.build_absolute_uri\
+                    ('/accounts/register/'), code)
+            message = message + body
+            context = {
+                'message': message }
                 
-                #print "برای فعال کردن اکانت بستون خود روی لینک روبرو کلیک کنید :\
-                #  http://bestoon.ir/accounts/register/?email={}&code={}". format(email, code)
+            #print "برای فعال کردن اکانت بستون خود روی لینک روبرو کلیک کنید :\
+            #  http://bestoon.ir/accounts/register/?email={}&code={}". \
+            # format(email, code)
 
 
-                #message = PMMail(api_key = settings.POSTMARK_API_TOKEN,
-                #                 subject = "فعال سازی اکانت بستون",
-                #                 sender = "mohbde@yahoo.com",
-                #                 to = email,
-                #                 text_body = "برای فعال \
-                # اکانت بستون خود روی لینک روبرو کلیک کنید\
-                # : http://bestoon.ir/accounts/register/?code={}".\
-                # format(code),
-                #                 tag = "account request")
-                #message.send()
+            #message = PMMail(api_key = settings.POSTMARK_API_TOKEN,
+            #                 subject = "فعال سازی اکانت بستون",
+            #                 sender = "mohbde@yahoo.com",
+            #                 to = email,
+            #                 text_body = "برای فعال \
+            # اکانت بستون خود روی لینک روبرو کلیک کنید\
+            # : http://bestoon.ir/accounts/register/?code={}".\
+            # format(code),
+            #                 tag = "account request")
+            #message.send()
                 
                 
-                #context = {'message':\
-                #            'ایمیلی حاوی لینک فعال سازی اکانت \
-                #                به شما فرستاده شده، \
-                #                    لطفا پس از چک کردن ایمیل، روی لینک کلیک کنید.'}
-                return render(request, 'index.html', context)
+            #context = {'message':\
+            #            'ایمیلی حاوی لینک فعال سازی اکانت \
+            #                به شما فرستاده شده، \
+            #                    لطفا پس از چک کردن ایمیل، \
+            # روی لینک کلیک کنید.'}
+            return render(request, 'index.html', context)
         else:
-            context = {'message': \
-                       'متاسفانه این نام کاربری قبلا استفاده شده است. \
-                        از نام کاربری دیگری استفاده کنید. \
-                            ببخشید که فرم ذخیره نشده. درست می شه'}
+            context = {
+                'message': \
+                    'متاسفانه این نام کاربری قبلا استفاده شده است. \
+                    از نام کاربری دیگری استفاده کنید. \
+                    ببخشید که فرم ذخیره نشده. درست می شه'}
             #TODO: forgot password
             #TODO: keep the form data
             return render(request, 'register.html', context)
+    
     elif request.GET.has_key('code'):  # user clicked on code
-        #email = request.GET['email'] (THIS WAS IN A COMMIT, MAYBE IT WILL BE BACK)
+        #email = request.GET['email'] \
+        # (THIS WAS IN A COMMIT, MAYBE IT WILL BE BACK)
         code = request.GET['code']
-        if Passwordresetcodes.objects.filter\
-            (code=code).exists(): 
+        
+        if Passwordresetcodes.objects.filter(
+            code=code).exists(): 
             #if code is in temporary db, read the data and create the user
-            
-            
+                        
             new_temp_user = Passwordresetcodes.objects.get(code=code)
-            newuser = User.objects.create\
-                (username=new_temp_user.username, \
-                 password=new_temp_user.password, email=new_temp_user.email)
+            newuser = User.objects.create(
+                username=new_temp_user.username,
+                password=new_temp_user.password,
+                email=new_temp_user.email)
             this_token = get_random_string(length=48)
             token = Token.objects.create(user=newuser, token=this_token)
             #delete the temporary activation code from db
@@ -202,10 +214,11 @@ def register(request):
             
             
 
-            context = {'message':\
-                        'اکانت شما ساخته شد. توکن شما\
-                              {} است. آن را ذخیره کنید زیرا دیگر نمایش داده نخواهد شد.!\
-                                  جدی'.format(this_token)}
+            context = {
+                'message':
+                'اکانت شما ساخته شد. توکن شما\
+                {} است. آن را ذخیره کنید زیرا دیگر نمایش داده نخواهد شد.!\
+                      جدی'.format(this_token)}
             return render(request, 'index.html', context)
         else:
             context = {
@@ -224,12 +237,13 @@ def register(request):
 @require_POST
 def whoami(request):
     if request.POST.has_key('token'):
-        this_token = request.POST['token']  # TODO: Check if there is no `token`-done-please check it
+        this_token = request.POST['token']  # TODO: Check \
+        #if there is no `token`-done-please check it
         # Check if there is a user with this token; will retun 404 instead.
         this_user = get_object_or_404(User, token__token=this_token)
 
         return JsonResponse({
-        'user': this_user.username,
+            'user': this_user.username,
         }, encoder=JSONEncoder)   #return {'user':'USERNAME'}
 
     else:
