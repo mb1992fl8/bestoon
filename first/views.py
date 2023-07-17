@@ -13,6 +13,7 @@ from datetime import datetime
 from django.core import serializers
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password, check_password
@@ -73,11 +74,14 @@ random_str = lambda N: ''.join(
 
 
 
+
 @csrf_exempt
 def news(request):
     news = News.objects.all().order_by('-date')[:11]
     news_serialized = serializers.serialize("json", news)
     return JsonResponse(news_serialized, encoder=JSONEncoder, safe=False)
+
+
 
 
 
@@ -105,7 +109,7 @@ def login(request):
             return JsonResponse (context, encoder=JSONEncoder)
 
 
-#register (web)
+# register (web)
 def register(request):
     if request.POST.has_key(
         'requestcode'):  #form is filled. if not spam, 
@@ -241,7 +245,7 @@ def whoami(request):
 # return General Status of a user as Json (income,expense)
 
 
-#query_income
+# query_income
 @csrf_exempt
 @require_POST
 def query_incomes(request):
@@ -254,7 +258,8 @@ def query_incomes(request):
 
 
 
-#query_expense
+
+# query_expense
 @csrf_exempt
 @require_POST
 def query_expenses(request):
@@ -264,6 +269,7 @@ def query_expenses(request):
     expenses = Expense.objects.filter(user=this_user).order_by('-date')[:num]
     expenses_serialized = serializers.serialize("json", expenses)
     return JsonResponse(expenses_serialized, encoder=JSONEncoder, safe=False)
+
 
 
 
@@ -285,13 +291,19 @@ def generalstat(request):
     return JsonResponse(context, encoder=JSONEncoder)
 
 
-#homepage of System
+
+
+
+# homepage of System
 def index(request):
     context = {}
     return render(request, 'index.html', context)
 
 
-#submit an income to system (api) , input : token(POST) , output : status
+
+
+
+# submit an income to system (api) , input : token(POST) , output : status
 #  = (ok)
 
 @csrf_exempt
@@ -299,40 +311,39 @@ def index(request):
 def submit_income(request):
     """ submit an income """
 
-    # TODO; validate data. user might be fake. token might be fake, \
-    # amount might be...
-    # TODO: is the token valid?
-    this_token = request.POST['token']
+    # TODO; revise validation for the amount
+    this_date = request.POST['date'] if 'date' in request.POST else timezone.now()
+    this_text = request.POST['text'] if 'text' in request.POST else ""
+    this_amount = request.POST['amount'] if 'amount' in request.POST else "0"
+    this_token = request.POST['token'] if 'token' in request.POST else ""
     this_user = get_object_or_404(User, token__token=this_token)
-    if 'date' not in request.POST:
-        date = datetime.now()
-    else:
-        date = request.POST['date']
-    Income.objects.create(user=this_user, amount=request.POST['amount'],
-                          text=request.POST['text'], date=date)
+    
+    Income.objects.create(user=this_user, amount=this_amount,
+                          text=this_text, date=this_date)
 
     return JsonResponse({
         'status': 'ok',
-    }, encoder=JSONEncoder) #return {'status':'ok'}
+    }, encoder=JSONEncoder) # return {'status':'ok'}
 
 
-#submit an expense to system (api) , input : token(POST) , output : status = (ok)
+
+
+
+# submit an expense to system (api) , input : token(POST) , output : status = (ok)
 @csrf_exempt
 @require_POST
 def submit_expense(request):
     """ submit an expense """
 
-    # TODO; validate data. user might be fake. token might be fake, \
-    # amount might be...
-    # TODO: is the token valid?
-    this_token = request.POST['token']
+    # TODO; revise validation for the amount
+    this_date = request.POST['date'] if 'date' in request.POST else timezone.now()
+    this_text = request.POST['text'] if 'text' in request.POST else ""
+    this_amount = request.POST['amount'] if 'amount' in request.POST else "0"
+    this_token = request.POST['token'] if 'token' in request.POST else ""
     this_user = get_object_or_404(User, token__token=this_token)
-    if 'date' not in request.POST:
-        date = datetime.now()
-    else:
-        date = request.POST['date']
-    Expense.objects.create(user=this_user, amount=request.POST['amount'],
-                           text=request.POST['text'], date=date)
+
+    Expense.objects.create(user=this_user, amount=this_amount,
+                           text=this_text, date=this_date)
 
     return JsonResponse({
         'status': 'ok',
