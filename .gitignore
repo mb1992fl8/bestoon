@@ -96,6 +96,7 @@ ENV/
 #SQL Lite DBs
 *.sqlite3
 *.origin
+.DS_Store
 bestoon/settings.py
 
 bestoon/__init__.pyc
