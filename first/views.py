@@ -342,6 +342,29 @@ def submit_income(request):
 
 
 
+@csrf_exempt
+@require_POST
+def edit_income(request):
+    """ edit an income """
+    this_text = request.POST['text'] if 'text' in request.POST else ""
+    this_amount = request.POST['amount'] if 'amount' in request.POST else "0"
+    this_pk = request.POST['id'] if 'id' in request.POST else "0"
+    this_token = request.POST['token'] if 'token' in request.POST else ""
+    this_user = get_object_or_404(User, token__token=this_token)
+
+    this_income = get_object_or_404(Income, pk=this_pk, user=this_user)
+    this_income.text = this_text
+    this_income.amount = this_amount
+    this_income.save()
+
+    return JsonResponse({
+        'status': 'ok',
+    }, encoder=JSONEncoder)
+
+
+
+
+
 
 # submit an expense to system (api) , input : token(POST) , output : status = (ok)
 @csrf_exempt
@@ -362,6 +385,30 @@ def submit_expense(request):
     return JsonResponse({
         'status': 'ok',
     }, encoder=JSONEncoder) #return {'status':'ok'}
+
+
+
+@csrf_exempt
+@require_POST
+def edit_expense(request):
+    """ edit an expense """    
+    this_text = request.POST['text'] if 'text' in request.POST else ""
+    this_amount = request.POST['amount'] if 'amount' in request.POST else "0"
+    this_pk = request.POST['id'] if 'id' in request.POST else "0"
+    this_token = request.POST['token'] if 'token' in request.POST else ""
+    this_user = get_object_or_404(User, token__token=this_token)
+
+    this_expense = get_object_or_404(Expense, pk=this_pk, user=this_user)
+    this_expense.text = this_text
+    this_expense.amount = this_amount
+    this_expense.save()
+
+    return JsonResponse({
+        'status': 'ok',
+    }, encoder=JSONEncoder)
+
+
+
 
 
 
